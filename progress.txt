@@ -1,0 +1,6 @@
+
+
+chart.js : 46:39   
+sidebar   : 53:53
+mbl navbar : 1:05:56
+Right sidebar: 1:16:04
