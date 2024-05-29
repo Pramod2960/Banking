@@ -19,7 +19,7 @@ export const Sidebar = (
 
         <Link
         href="/"
-        className='flex mb-12 cursor-pointer items-center gap-2'
+        className='flex mb-12 cursor-pointer items-center gap-2 px-4'
         >
             <Image 
             src="/icons/logo.svg"

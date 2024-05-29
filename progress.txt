@@ -5,3 +5,4 @@ sidebar   : 53:53
 mbl navbar : 1:05:56
 Right sidebar: 1:16:04
 Sign-in : 1:39:33
+Sign-up : 2:15:39
