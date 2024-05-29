@@ -22,27 +22,38 @@ import { Input } from "@/components/ui/input";
 import CustromInput from "./CustromInput";
 import { Loader2 } from "lucide-react";
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8)
-});
+const formSchema = (type: string) =>
+  z.object({
+    //sign-up
+    firstName: type === "sign-in" ? z.string().optional() : z.string().min(3),
+    lastName: type === "sign-in" ? z.string().optional() : z.string().min(3),
+    address: type === "sign-in" ? z.string().optional() : z.string().max(50),
+    state: type === "sign-in" ? z.string().optional() : z.string().min(3),
+    postalCode: type === "sign-in" ? z.string().optional() : z.string().max(6),
+    dob: type === "sign-in" ? z.string().optional() : z.string().min(3),
+
+    //both
+    email: z.string().email(),
+    password: z.string().min(8),
+  });
 
 const AuthForm = ({ type }: { type: string }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
+  
+  //1. define the form
+  const authFormSchema = formSchema(type);
 
-  ;//1. define the form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof authFormSchema>>({
+    resolver: zodResolver(authFormSchema),
     defaultValues: {
       email: "",
-      password: ""
+      password: "",
     },
   });
 
-
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof authFormSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
@@ -85,58 +96,98 @@ const AuthForm = ({ type }: { type: string }) => {
         <>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              {type === "sign-up" && (
+                <>
 
-             <CustromInput
-             form={form}
-             name='email'
-             placeholder='Enter your email'
-             label="Email"
-             />   
+                <div className="flex gap-4">
+                <CustromInput
+                    form={form}
+                    label="First Name"
+                    name="firstName"
+                    placeholder="Enter your first name"
+                  />
+                  <CustromInput
+                    form={form}
+                    label="Last Name"
+                    name="lastName"
+                    placeholder="Enter your last name"
+                  />
+                </div>
+                 
+                  <CustromInput
+                    form={form}
+                    label="Address"
+                    name="address"
+                    placeholder="Enter your Specific Address"
+                  />
 
-             <CustromInput
-             form={form}
-             name='password'
-             label='Password'
-             placeholder='Enter your password'
-             />  
+<div className="flex gap-4">
+                  <CustromInput
+                    form={form}
+                    label="State"
+                    name="state"
+                    placeholder="Enter your State e.g RAJ"
+                  />
+                  <CustromInput
+                    form={form}
+                    label="Postal Code"
+                    name="postalCode"
+                    placeholder="Enter your Postal Code e.g 125006"
+                  />
+                  </div>
+                  <CustromInput
+                    form={form}
+                    label="Date of Brith"
+                    name="dob"
+                    placeholder="e.g. YYYY-MM-DD"
+                  />
+                </>
+              )}
 
-             <div className="flex flex-col gap-4">
-             <Button type="submit"
-              className="form-btn"
-              >
-                {isLoading? (
-                  <>
-                  <Loader2 size={20}
-                  className="animate-spin" /> &nbsp; Loading...
-                  </>
-                ):(
-                  type==="sign-in"? 'Sign-in' : 'Sign-up'
-                )}
-              
-              </Button>
-              </div> 
+              <CustromInput
+                form={form}
+                name="email"
+                placeholder="Enter your email"
+                label="Email"
+              />
 
-             
+              <CustromInput
+                form={form}
+                name="password"
+                label="Password"
+                placeholder="Enter your password"
+              />
+
+              <div className="flex flex-col gap-4">
+                <Button type="submit" className="form-btn">
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" /> &nbsp;
+                      Loading...
+                    </>
+                  ) : type === "sign-in" ? (
+                    "Sign-in"
+                  ) : (
+                    "Sign-up"
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
 
-           <footer className="flex justify-center gap-1">
+          <footer className="flex justify-center gap-1">
             <p className="text-14 font-normal text-gray-600">
-              {type==="sign-in"? "Don't have account?" :
-              "Already have an account?"
-              }
+              {type === "sign-in"
+                ? "Don't have account?"
+                : "Already have an account?"}
             </p>
-            <Link href={type==="sign-in"? "/sign-up"
-              : "sign-in"}
+            <Link
+              href={type === "sign-in" ? "/sign-up" : "sign-in"}
               className="form-link"
-              >
-                {type==="sign-in"? "Sign up" :'Sign in'}
-              </Link>
-
-
-           </footer>
-
-
+            >
+              {type === "sign-in" ? "Sign up" : "Sign in"}
+            </Link>
+          </footer>
         </>
       )}
     </section>
