@@ -21,6 +21,8 @@ import {
 import { Input } from "@/components/ui/input";
 import CustromInput from "./CustromInput";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { signIn, signUp } from "@/lib/actions/users.actions";
 
 const formSchema = (type: string) =>
   z.object({
@@ -28,6 +30,7 @@ const formSchema = (type: string) =>
     firstName: type === "sign-in" ? z.string().optional() : z.string().min(3),
     lastName: type === "sign-in" ? z.string().optional() : z.string().min(3),
     address: type === "sign-in" ? z.string().optional() : z.string().max(50),
+    city: type === "sign-in" ? z.string().optional() : z.string().max(10),
     state: type === "sign-in" ? z.string().optional() : z.string().min(3),
     postalCode: type === "sign-in" ? z.string().optional() : z.string().max(6),
     dob: type === "sign-in" ? z.string().optional() : z.string().min(3),
@@ -38,9 +41,10 @@ const formSchema = (type: string) =>
   });
 
 const AuthForm = ({ type }: { type: string }) => {
+  const router = useRouter();
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); 
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   //1. define the form
   const authFormSchema = formSchema(type);
 
@@ -53,14 +57,32 @@ const AuthForm = ({ type }: { type: string }) => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof authFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
 
+  const onSubmit = async (data: z.infer<typeof authFormSchema>) => {
     setIsLoading(true);
-    console.log(values);
-    setIsLoading(false);
-  }
+
+    try {
+      if (type === "sign-up") {
+        const newUser = await signUp(data);
+         setUser(newUser);
+      }
+
+     /* if (type === "sign-in") {
+       const response = await signIn({
+          email: data.email,
+          password: data.password,
+        });
+
+        if (response) {
+          router.push("/");
+        }  
+      }*/
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section className="auth-form">
@@ -98,42 +120,47 @@ const AuthForm = ({ type }: { type: string }) => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {type === "sign-up" && (
                 <>
+                  <div className="flex gap-4">
+                    <CustromInput
+                      form={form}
+                      label="First Name"
+                      name="firstName"
+                      placeholder="Enter your first name"
+                    />
+                    <CustromInput
+                      form={form}
+                      label="Last Name"
+                      name="lastName"
+                      placeholder="Enter your last name"
+                    />
+                  </div>
 
-                <div className="flex gap-4">
-                <CustromInput
-                    form={form}
-                    label="First Name"
-                    name="firstName"
-                    placeholder="Enter your first name"
-                  />
-                  <CustromInput
-                    form={form}
-                    label="Last Name"
-                    name="lastName"
-                    placeholder="Enter your last name"
-                  />
-                </div>
-                 
                   <CustromInput
                     form={form}
                     label="Address"
                     name="address"
                     placeholder="Enter your Specific Address"
                   />
+                  <CustromInput
+                    form={form}
+                    label="City"
+                    name="city"
+                    placeholder="Enter your City"
+                  />
 
-<div className="flex gap-4">
-                  <CustromInput
-                    form={form}
-                    label="State"
-                    name="state"
-                    placeholder="Enter your State e.g RAJ"
-                  />
-                  <CustromInput
-                    form={form}
-                    label="Postal Code"
-                    name="postalCode"
-                    placeholder="Enter your Postal Code e.g 125006"
-                  />
+                  <div className="flex gap-4">
+                    <CustromInput
+                      form={form}
+                      label="State"
+                      name="state"
+                      placeholder="Enter your State e.g RAJ"
+                    />
+                    <CustromInput
+                      form={form}
+                      label="Postal Code"
+                      name="postalCode"
+                      placeholder="Enter your Postal Code e.g 125006"
+                    />
                   </div>
                   <CustromInput
                     form={form}
